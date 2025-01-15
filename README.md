@@ -1,10 +1,25 @@
-# routine management MS
+
+
+# Routine Management MS
 
 This is a Go-based CRUD MS application for managing exercises and routines. It uses MongoDB as the database and the `chi` router for routing. The application exposes RESTful API endpoints for managing exercises and routines.
 
 ---
 
-## Installation and Setup
+## Docker
+
+To build and run the application using Docker:
+
+```bash
+sudo docker build -t routineManagement_ms .
+sudo docker run --rm -p 3000:3000 --env-file .env routineManagement_ms
+```
+
+---
+
+
+
+## Installation and Setup without docker
 
 ### Prerequisites
 - Go 1.20 or later installed on your system
@@ -27,9 +42,6 @@ Update the `DB` connection in the application code to point to your MongoDB inst
 ```bash
 MONGO_URI = connection_string_given_by_atlas
 ```
-
-
-
 
 ### Run the Application
 Start the server:
