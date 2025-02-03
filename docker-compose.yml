@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   routine_service:
-    container_name: routine_service
+    container_name: routines_service
     build: .
     ports:
       - '3001:3001'
