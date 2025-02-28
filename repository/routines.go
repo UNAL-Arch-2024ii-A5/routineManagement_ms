@@ -70,11 +70,22 @@ func (r *RoutineRepository) GetRoutineByID(ctx context.Context, id primitive.Obj
 	return &routine, nil
 }
 
+// ListRoutineDetailed retrieves all routines with full exercise details using an aggregation pipeline.
 func (r *RoutineRepository) ListRoutines(ctx context.Context) ([]models.Routine, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	cursor, err := r.Collection.Find(ctx, bson.M{})
+	pipeline := mongo.Pipeline{
+		// The $lookup stage joins the exercises collection.
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "exercises"},
+			{Key: "localField", Value: "routine_exercises"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "exercises"},
+		}}},
+	}
+
+	cursor, err := r.Collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +95,6 @@ func (r *RoutineRepository) ListRoutines(ctx context.Context) ([]models.Routine,
 	if err := cursor.All(ctx, &routines); err != nil {
 		return nil, err
 	}
-
 	return routines, nil
 }
 
@@ -115,4 +125,37 @@ func (r *RoutineRepository) DeleteRoutineByID(ctx context.Context, id primitive.
 
 	_, err := r.Collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
+}
+
+// GetRoutineDetailedByID retrieves a routine along with full exercise details using an aggregation pipeline.
+func (r *RoutineRepository) GetRoutineDetailedByID(ctx context.Context, id primitive.ObjectID) (*models.Routine, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	// Aggregation pipeline: match the routine, then lookup exercise details.
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "_id", Value: id}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "exercises"},
+			{Key: "localField", Value: "routine_exercises"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "exercises"},
+		}}},
+	}
+
+	cursor, err := r.Collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var routines []models.Routine
+	if err = cursor.All(ctx, &routines); err != nil {
+		return nil, err
+	}
+	if len(routines) == 0 {
+		return nil, mongo.ErrNoDocuments
+	}
+
+	return &routines[0], nil
 }

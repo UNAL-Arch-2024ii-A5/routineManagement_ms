@@ -1,4 +1,3 @@
-// handler/routines.go
 package handler
 
 import (
@@ -69,7 +68,8 @@ func (r *Routine) GetRoutineByID(w http.ResponseWriter, req *http.Request) {
 	}
 
 	ctx := req.Context()
-	routine, err := r.Repo.GetRoutineByID(ctx, objID)
+	// Call the detailed version to get full exercise details
+	routine, err := r.Repo.GetRoutineDetailedByID(ctx, objID)
 	if err != nil {
 		http.Error(w, "Routine not found", http.StatusNotFound)
 		return
