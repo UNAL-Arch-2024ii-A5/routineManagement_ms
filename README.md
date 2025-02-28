@@ -12,7 +12,7 @@ To build and run the application using Docker:
 
 ```bash
 sudo docker build -t routineManagement_ms .
-sudo docker run --rm -p 3000:3000 --env-file .env routineManagement_ms
+sudo docker run --rm -p 3001:3001 --env-file .env routineManagement_ms
 ```
 
 ---
@@ -27,7 +27,7 @@ sudo docker run --rm -p 3000:3000 --env-file .env routineManagement_ms
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/your-username/exercise_api.git
+git clone https://github.com/UNAL-Arch-2024ii-A5/routineManagement_ms.git
 cd exercise_api
 ```
 
