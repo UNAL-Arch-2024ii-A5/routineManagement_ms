@@ -44,6 +44,9 @@ func (r *Routine) CreateRoutine(w http.ResponseWriter, req *http.Request) {
 	// Remove duplicate muscles
 	routine.RoutineMuscles = removeDuplicateMuscles(muscles)
 
+	// The new field CustomerId is accepted as is from the JSON request.
+	// (Add additional validation for customer IDs if needed.)
+
 	ctx := req.Context()
 	result, err := r.Repo.CreateRoutine(ctx, routine)
 	if err != nil {
@@ -68,7 +71,6 @@ func (r *Routine) GetRoutineByID(w http.ResponseWriter, req *http.Request) {
 	}
 
 	ctx := req.Context()
-	// Call the detailed version to get full exercise details
 	routine, err := r.Repo.GetRoutineDetailedByID(ctx, objID)
 	if err != nil {
 		http.Error(w, "Routine not found", http.StatusNotFound)
@@ -125,6 +127,9 @@ func (r *Routine) UpdateRoutineByID(w http.ResponseWriter, req *http.Request) {
 	// Remove duplicate muscles
 	routine.RoutineMuscles = removeDuplicateMuscles(muscles)
 
+	// The new field CustomerId is accepted as is from the JSON request.
+	// (Add additional validation for customer IDs if needed.)
+
 	ctx := req.Context()
 	if err := r.Repo.UpdateRoutineByID(ctx, objID, routine); err != nil {
 		if err == repository.ErrDuplicateRoutineName {
@@ -157,7 +162,6 @@ func (r *Routine) DeleteRoutineByID(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "Routine deleted successfully")
 }
 
-// Helper function to remove duplicate muscles
 func removeDuplicateMuscles(muscles []models.MuscularGroup) []models.MuscularGroup {
 	seen := make(map[uint64]bool)
 	result := make([]models.MuscularGroup, 0)
